@@ -81,9 +81,9 @@ public class GroupController {
 
     @PostMapping("/group/{id}/toss")
     public List<ParticipantSchema> tossParticipants(
-        @PathVariable @NotNull Integer groupId
+        @PathVariable @NotNull Integer id
     ) throws NotFoundException, ConflictException {
-        return groupService.tossParticipants(groupId).getParticipants();
+        return groupService.tossParticipants(id).getParticipants();
     }
 
     @GetMapping("/group/{groupId}/participant/{participantId}/recipient")
