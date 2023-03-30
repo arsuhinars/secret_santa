@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/group")
+@RequestMapping
 @Validated
 public class GroupController {
     private GroupService groupService;
@@ -24,19 +24,19 @@ public class GroupController {
         this.participantService = participantService;
     }
 
-    @PostMapping
+    @PostMapping("/group")
     public Integer createGroup(
         @RequestBody @Valid GroupCreateSchema group
     ) {
         return groupService.create(group).getId();
     }
 
-    @GetMapping
+    @GetMapping("/groups")
     public List<BriefGroupSchema> getAllGroups() {
         return groupService.getAll().stream().map(BriefGroupSchema::new).toList();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/group/{id}")
     public GroupSchema getGroupById(
         @PathVariable @NotNull Integer id
     ) throws NotFoundException {
@@ -48,7 +48,7 @@ public class GroupController {
         return group.get();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/group/{id}")
     public void updateGroupById(
         @PathVariable @NotNull Integer id,
         @RequestBody @Valid GroupUpdateSchema group
@@ -56,14 +56,14 @@ public class GroupController {
         groupService.updateById(id, group);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/group/{id}")
     public void deleteGroupById(
         @PathVariable @NotNull Integer id
     ) throws NotFoundException {
         groupService.deleteById(id);
     }
 
-    @PostMapping("/{id}/participant")
+    @PostMapping("/group/{id}/participant")
     public Integer addParticipantToGroup(
         @PathVariable @NotNull Integer groupId,
         @RequestBody ParticipantCreateSchema participant
@@ -71,7 +71,7 @@ public class GroupController {
         return participantService.create(groupId, participant).getId();
     }
 
-    @DeleteMapping("/{groupId}/participant/{participantId}")
+    @DeleteMapping("/group/{groupId}/participant/{participantId}")
     public void deleteParticipant(
         @PathVariable @NotNull Integer groupId,
         @PathVariable @NotNull Integer participantId
@@ -79,14 +79,14 @@ public class GroupController {
         participantService.deleteById(groupId, participantId);
     }
 
-    @PostMapping("/{id}/toss")
+    @PostMapping("/group/{id}/toss")
     public List<ParticipantSchema> tossParticipants(
         @PathVariable @NotNull Integer groupId
     ) throws NotFoundException, ConflictException {
         return groupService.tossParticipants(groupId).getParticipants();
     }
 
-    @GetMapping("/{groupId}/participant/{participantId}/recipient")
+    @GetMapping("/group/{groupId}/participant/{participantId}/recipient")
     public BriefParticipantSchema getParticipantRecipient(
         @PathVariable @NotNull Integer groupId,
         @PathVariable @NotNull Integer participantId
