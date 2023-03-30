@@ -65,10 +65,10 @@ public class GroupController {
 
     @PostMapping("/group/{id}/participant")
     public Integer addParticipantToGroup(
-        @PathVariable @NotNull Integer groupId,
+        @PathVariable @NotNull Integer id,
         @RequestBody ParticipantCreateSchema participant
     ) {
-        return participantService.create(groupId, participant).getId();
+        return participantService.create(id, participant).getId();
     }
 
     @DeleteMapping("/group/{groupId}/participant/{participantId}")
