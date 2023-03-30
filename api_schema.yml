@@ -1,0 +1,233 @@
+openapi: "3.0.3"
+
+
+info:
+  title: "Secret Santa"
+  version: "0.0.1"
+
+tags:
+  - name: Group
+
+
+paths:
+  /group:
+    post:
+      tags: [ Group ]
+      operationId: createGroup
+      summary: Создание новой группы
+      description: >
+        Добавление группы с возможностью указания названия (name), описания
+        (description). В ответе возвращает идентификатор созданной группы.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              title: GroupCreateSchema
+              type: object
+              properties:
+                name: { type: string, minLength: 1 }
+                description: { type: string }
+              required: [ name ]
+      responses:
+        "200":
+          description: Операция выполненна успешно
+          content:
+            application/json:
+              schema:
+                type: integer
+  
+  /groups:
+    get:
+      tags: [ Group ]
+      operationId: getAllGroups
+      summary: Получение краткой информации о всех группах
+      responses:
+        "200":
+          description: Операция выполненна успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/brief_group_schema"
+
+  /group/{id}:
+    get:
+      tags: [ Group ]
+      operationId: getGroupById
+      summary: Получение полной информации о группе по идентификатору
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Операция выполненна успешно
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/group_schema"
+    
+    put:
+      tags: [ Group ]
+      operationId: updateGroupById
+      summary: Редактирование группы по идентификатору группы
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              title: GroupUpdateSchema
+              type: object
+              properties:
+                name: { type: string, minLength: 1 }
+                description: { type: string }
+              required: [ name, description ]
+      responses:
+        "200":
+          description: Операция выполненна успешно
+    
+    delete:
+      tags: [ Group ]
+      operationId: deleteGroupById
+      summary: Удаление группы по идентификатору
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Операция выполненна успешно
+  
+  /group/{id}/participant:
+    post:
+      tags: [ Group ]
+      operationId: addParticipantToGroup
+      summary: Добавить нового участника в группу
+      description: >
+        Добавление нового участника группу по идентификатору группы.
+        В ответе возвращает идентификатор созданного участника.
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              title: ParticipantCreateSchema
+              type: object
+              properties:
+                name: { type: string, minLength: 1 }
+                wish: { type: string }
+              required: [ name ]
+      responses:
+        "200":
+          description: Операция выполненна успешно
+          content:
+            application/json:
+              schema:
+                type: integer
+  
+  /group/{groupId}/participant/{participantId}:
+    delete:
+      tags: [ Group ]
+      operationId: deleteParticipant
+      summary: Удаление участника из группы
+      parameters:
+        - $ref: "#/components/parameters/group_id"
+        - $ref: "#/components/parameters/participant_id"
+      responses:
+        "200":
+          description: Операция выполненна успешно
+  
+  /group/{id}/toss:
+    post:
+      tags: [ Group ]
+      operationId: tossParticipants
+      summary: Проведение жеребьевки в группе
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: Операция выполненна успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/participant_schema"
+  
+  /group/{groupId}/participant/{participantId}/recipient:
+    get:
+      tags: [ Group ]
+      operationId: getParticipantRecipient
+      summary: >
+        Получение информации для конкретного участника группы, кому он дарит подарок.
+      parameters:
+        - $ref: "#/components/parameters/group_id"
+        - $ref: "#/components/parameters/participant_id"
+      responses:
+        "200":
+          description: Операция выполненна успешно
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/brief_participant_schema"
+
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer }
+    group_id:
+      name: groupId
+      in: path
+      required: true
+      schema: { type: integer }
+    participant_id:
+      name: participantId
+      in: path
+      required: true
+      schema: { type: integer }
+
+  schemas:
+    group_schema:
+      title: GroupSchema
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        participants:
+          type: array
+          items:
+            $ref: "#/components/schemas/participant_schema"
+    
+    brief_group_schema:
+      title: BriefGroupSchema
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+
+    
+    participant_schema:
+      title: ParticipantSchema
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        wish: { type: string }
+        recipient:
+          $ref: "#/components/schemas/brief_participant_schema"
+    
+    brief_participant_schema:
+      title: BriefParticipantSchema
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        wish: { type: string }
+    
